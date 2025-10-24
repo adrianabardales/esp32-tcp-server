@@ -2,11 +2,15 @@
 #include "secrets.h"
 #include "WiFi.h"
 
+const int SERVER_LED_PIN = 21;
+
 const char *ssid = WIFI_SSID;
 const char *password = WIFI_PASSWORD;
 
 const int port = 10000;
 WiFiServer server(port);
+
+bool led = false;
 
 void handleTCPClient() {
   WiFiClient client = server.available();
@@ -14,6 +18,23 @@ void handleTCPClient() {
   if (client)
   {
     Serial.println("New client");
+
+    // display port number
+    Serial.print("Client remote IP: ");
+    Serial.println(client.remoteIP());
+
+    Serial.print("Client remote port: ");
+    Serial.println(client.remotePort());
+
+    Serial.print("Client local port: ");
+    Serial.print(client.localPort());
+
+    Serial.print("Client local IP: ");
+    Serial.print(client.localIP());
+    
+    led = !led;
+    digitalWrite(SERVER_LED_PIN, led); 
+
     /* check client is connected */
     while (client.connected())
     {
@@ -32,6 +53,11 @@ void handleTCPClient() {
         Serial.println((char *)data);
       }
     }
+
+    // client disconnected -> turn off LED and stop client
+    
+    client.stop();
+    Serial.println("Client disconnected");
   }
 }
 
@@ -109,6 +135,11 @@ void setup() {
 
   scanNetworks();
   connectToNetwork();
+
+  Serial.begin(115200);
+
+  pinMode(SERVER_LED_PIN, OUTPUT);
+  digitalWrite(SERVER_LED_PIN, LOW); // ensure LED off at startup
 
   Serial.println(WiFi.macAddress());
   Serial.println(WiFi.localIP());

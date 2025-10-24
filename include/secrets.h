@@ -1,2 +1,2 @@
-#define WIFI_SSID "ssid"
-#define WIFI_PASSWORD "mot_de_passe"
+#define WIFI_SSID "iot_tge"
+#define WIFI_PASSWORD "maisonneuve"
